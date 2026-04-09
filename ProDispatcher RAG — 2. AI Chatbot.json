@@ -1,0 +1,262 @@
+{
+  "name": "ProDispatcher RAG — 2. AI Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "prodispatcher-chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "93c6b4b5-8cd9-41c5-912f-cab2eba02fb3",
+      "name": "Chat Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        880,
+        64
+      ],
+      "webhookId": "prodispatcher-chat"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\nconst question = body.question || body.message || body.query || '';\nif (!question.trim()) {\n  throw new Error('No question provided. Send a POST request with { \"question\": \"your question here\" }');\n}\nreturn [{ json: { question: question.trim(), timestamp: new Date().toISOString() } }];"
+      },
+      "id": "4604f333-da13-4fac-81be-93b82879297d",
+      "name": "Extract Question",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "maxOutputTokens": 1024,
+          "temperature": 0.2
+        }
+      },
+      "id": "0fd64697-3ef4-4df6-9714-8b862b716e0a",
+      "name": "Gemini Flash LLM",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        240
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "I2XqvQeWM10dZxig",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "query": "={{ $json.question }}",
+        "options": {}
+      },
+      "id": "f8d7fb80-be50-4fe1-b57b-244c58688419",
+      "name": "QA Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\nconst answer = input.output \n  || input.text \n  || input.answer\n  || input.response\n  || input.message\n  || JSON.stringify(input);\n\nreturn [{\n  json: {\n    success: true,\n    question: $('Extract Question').first().json.question,\n    answer: answer,\n    source: 'ProDispatcher Knowledge Base',\n    timestamp: new Date().toISOString(),\n    book_a_call: 'https://calendly.com/acquahgrantcarl/30min',\n    take_the_audit: 'https://prodispatcher-website.vercel.app/index.html'\n  }\n}];"
+      },
+      "id": "6aacf1bb-3d7a-4020-84de-88acc8756a01",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "d4baeb31-3594-419f-bf36-a56387ff09b7",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1776,
+        64
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        240
+      ],
+      "id": "b2b9afa6-6602-41fd-b05b-f832ed0af46a",
+      "name": "Vector Store Retriever"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-2-preview"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        528
+      ],
+      "id": "6d461cc9-67d0-45c7-b3b4-1389b054ad3f",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "I2XqvQeWM10dZxig",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "prodispatcher-kb",
+          "mode": "list",
+          "cachedResultName": "prodispatcher-kb"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        1248,
+        384
+      ],
+      "id": "04320117-dff9-47e8-870c-94a6a5d74b8e",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "whreDlgcvb5X1X3z",
+          "name": "PineconeApi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Question",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Question": {
+      "main": [
+        [
+          {
+            "node": "QA Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Flash LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "QA Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QA Chain": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store Retriever": {
+      "ai_retriever": [
+        [
+          {
+            "node": "QA Chain",
+            "type": "ai_retriever",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Retriever",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "75c84ef3-6c66-4f84-b9b6-0ab6a4d9cae3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "daecaa4be5f444c9253014e563162f654604c3b4e53c674d3d35eee7b4070d19"
+  },
+  "id": "VbS1t8nInPa3XY7p",
+  "tags": [
+    {
+      "updatedAt": "2026-03-30T04:16:05.102Z",
+      "createdAt": "2026-03-30T04:16:05.102Z",
+      "id": "JqaqfcWKL5WzNlZe",
+      "name": "ProDispatcher RAG"
+    }
+  ]
+}

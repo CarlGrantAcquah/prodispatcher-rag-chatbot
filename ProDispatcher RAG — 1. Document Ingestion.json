@@ -1,0 +1,177 @@
+{
+  "name": "ProDispatcher RAG — 1. Document Ingestion",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "4ab6259b-6326-44b1-a015-f274bec04506",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = `PRODISPATCHER KNOWLEDGE BASE\n\nSECTION 1 — COMPANY OVERVIEW\nCompany: ProDispatcher. Founder: Carl Grant-Acquah. Tagline: Stop Being The Receptionist In Your Own Business. Mission: Install AI receptionists and automation systems that capture every lead 24/7 for HVAC and Plumbing business owners. Target clients: HVAC and Plumbing business owners in North America. Data foundation: Based on 1M+ in managed home service revenue.\n\nSECTION 2 — THE CORE PROBLEM\nMissed Calls: Only 4% of people leave voicemails. The other 96% hang up and call the next number. The average HVAC or Plumbing owner misses 5 to 15 calls per week. At $850 per job, that is $22,000 to $66,000 in lost revenue every month.\nOwner Dependence: If the owner cannot take a day off without the phones going dark, they do not own a business — they own a high-stress job with no sick days.\nNo Systems: Manual follow-ups, sticky-note CRMs, and missed leads create zero visibility. ProDispatcher measures the exact revenue being lost.\n\nSECTION 3 — THE THREE SERVICE TIERS\n\nTIER 1 — Emergency Response System — Crisis Mode\nWho qualifies: Autonomy Score 0 to 40 percent. Setup fee: $497. Monthly fee: $297. Pays for itself with 1 saved job per month. Go-live time: 48 hours.\nIncludes: 24/7 AI Receptionist answering FAQs, taking messages, filtering spam. Instant after-hours coverage. Emergency escalation for burst pipe, no heat, gas smell. Full call recording. Done-For-You setup.\n\nTIER 2 — Growth Partner Package — Growth Mode — Most Popular\nWho qualifies: Autonomy Score 41 to 70 percent. Setup fee: $997. Monthly fee: $497. Average client recovers $15,000 in month 1.\nIncludes everything in Crisis Mode plus: Calendar integration — AI books directly into owner schedule. Smart CRM sync — every caller auto-logged. Call intelligence — transcripts and sentiment analysis. Reputation management — automated review requests after job completion.\n\nTIER 3 — Market Leader Ecosystem — Scale Mode\nWho qualifies: Autonomy Score 71 to 100 percent. Setup fee: $2,500+. Monthly fee: $997. Built for businesses targeting $1M+ annual revenue.\nIncludes everything in Growth Mode plus: Referral partner network with realtors and contractors. Social media content engine with automated posts. Quarterly strategy calls and data review. Priority support with direct line to tech team.\n\nSECTION 4 — AI RECEPTIONIST DETAILS\nThe AI receptionist is a voice AI trained specifically for HVAC and Plumbing. It answers every call 24/7/365. It greets callers professionally. It handles FAQs about services, pricing, and availability. It collects caller name, address, phone, and issue description. It books appointments into the owner calendar. It logs every caller into the CRM automatically. It filters spam calls.\nEmergency handling: Recognizes keywords — burst pipe, no heat, gas smell, flooding, no AC. Responds with urgency. Immediately notifies the owner via SMS and phone call. Lead captured and dispatched in under 90 seconds. Estimated value per emergency capture: $1,700+.\n\nSECTION 5 — THE BUSINESS AUTONOMY AUDIT\n15 questions, under 2 minutes. Free. No credit card required.\nOutput: Personalized Autonomy Score from 0 to 100, tier recommendation, custom action plan PDF.\nThree scoring categories: Availability Check — do leads reach you or your voicemail. Speed to Lead — are you responding in under 5 minutes or over 1 hour. System Dependency — is your business running you or are you running it.\nScore ranges: 0 to 40 equals Crisis Mode, Emergency Response System. 41 to 70 equals Growth Mode, Growth Partner Package. 71 to 100 equals Scale Mode, Market Leader Ecosystem.\n\nSECTION 6 — REVENUE CALCULATOR\nThe ProDispatcher Revenue Leakage Calculator shows owners exactly how much they are losing to missed calls.\nInputs: Industry selection — HVAC, Plumbing, Electrical. Average job value in dollars. Inbound calls per day. Missed call rate as a percentage. After-hours and weekend toggle.\nSample output: Annual Revenue Lost $240,000. Monthly Loss $20,000. Missed Jobs Per Year 282.\nKey insight: The AI receptionist answers 24/7 for $1,000 per month — less than the cost of 2 missed calls.\n\nSECTION 7 — RESULTS AND SOCIAL PROOF\nSystem stats: 95%+ call answer rate. 24/7 always-on coverage. 7 days from deposit to go-live. Zero missed revenue after implementation.\nClient: Mike Thompson, Thompson Heating and Air — Revenue is up 35% and I am sleeping better at night. We have not missed a single emergency call since implementing the AI receptionist.\nClient: James Rivera, Rivera Plumbing Solutions — I used to answer phones while under a sink. Now the system handles everything. I just show up, do the work, and the CRM has every lead ready for follow-up.\nClient: Darnell Williams, Williams HVAC Services — The audit told me I was in Crisis Mode. I did not believe it until I saw the calculator. $144K a year in missed calls. Set up in 3 days. Worth every penny.\n\nSECTION 8 — FREQUENTLY ASKED QUESTIONS\nQ: How does the AI receptionist actually work? A: The AI receptionist uses voice AI trained specifically for HVAC and Plumbing. It answers every call professionally, handles FAQs, collects customer info, routes emergencies instantly, and books appointments into the calendar without the owner lifting a finger.\nQ: Can it handle emergency calls like burst pipes or no heat? A: Yes. It recognizes emergency keywords and responds with urgency. It collects all details and immediately notifies the owner via SMS and call.\nQ: How long does setup take? A: 7 days from deposit to go-live. ProDispatcher handles the full technical setup including AI configuration, CRM integration, calendar sync, and testing.\nQ: What if I am not sure which tier I need? A: Take the free Business Autonomy Audit. 15 questions, under 2 minutes. Your score automatically places you in the right tier.\nQ: What is the guarantee? A: Every tier pays for itself with 1 saved job per month or ProDispatcher refunds you in full, no questions asked.\nQ: Do I need technical knowledge? A: None at all. ProDispatcher handles the complete technical setup.\nQ: How do I get started? A: Take the free audit at the ProDispatcher website. Under 2 minutes. Get your score, tier recommendation, and custom action plan — free.\n\nSECTION 9 — CONTACT\nFounder: Carl Grant-Acquah. Email: carlgrantacquah@gmail.com. Strategy call: calendly.com/acquahgrantcarl/30min. LinkedIn: linkedin.com/in/carl-grant-acquah. Website: prodispatcher-website.vercel.app. Audit URL: prodispatcher-website.vercel.app/index.html. Calculator URL: prodispatcher-website.vercel.app/calculator.html.`;\n\nconst chunkSize = 400;\nconst overlap = 80;\nconst chunks = [];\nlet start = 0;\nwhile (start < text.length) {\n  const end = Math.min(start + chunkSize, text.length);\n  const chunk = text.slice(start, end);\n  chunks.push({ json: { text: chunk, source: 'prodispatcher-knowledge-base', chunkIndex: chunks.length } });\n  start += chunkSize - overlap;\n}\nreturn chunks;"
+      },
+      "id": "be78484e-5a8d-466d-a62b-172c34098258",
+      "name": "Chunk Documents",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-2-preview"
+      },
+      "id": "5a4c01a8-7897-4583-9f35-9df22a124b42",
+      "name": "Google Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        352,
+        176
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "I2XqvQeWM10dZxig",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { status: 'SUCCESS', message: `ProDispatcher knowledge base ingested into Pinecone. ${$input.all().length} chunks processed.`, timestamp: new Date().toISOString() } }];"
+      },
+      "id": "c3f12992-55f9-4c4f-8a47-907acffd107b",
+      "name": "Confirm Ingestion",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        176
+      ],
+      "id": "47d40cd6-9f6d-4425-9155-7a5ca983ebb1",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "prodispatcher-kb",
+          "mode": "list",
+          "cachedResultName": "prodispatcher-kb"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        16
+      ],
+      "id": "c40e4ee6-87c6-4766-a3cb-215cc5b7d357",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "whreDlgcvb5X1X3z",
+          "name": "PineconeApi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Chunk Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chunk Documents": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Confirm Ingestion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "3ecd16c4-863b-4d80-8b3d-762682bcc431",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "daecaa4be5f444c9253014e563162f654604c3b4e53c674d3d35eee7b4070d19"
+  },
+  "id": "jwd6ZtmSCbqFfMhn",
+  "tags": [
+    {
+      "updatedAt": "2026-03-30T04:16:05.102Z",
+      "createdAt": "2026-03-30T04:16:05.102Z",
+      "id": "JqaqfcWKL5WzNlZe",
+      "name": "ProDispatcher RAG"
+    }
+  ]
+}
